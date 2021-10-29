@@ -4,7 +4,7 @@ import ReactDOM from 'react-dom';
 import App from './App';
 import './customStyle.css';
 
-axios.defaults.baseURL = 'http://laravel-react-auth.herokuapp.com/api/';
+axios.defaults.baseURL = 'https://laravel-react-auth.herokuapp.com/api/';
 axios.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem( 'token' );
 
 ReactDOM.render(
