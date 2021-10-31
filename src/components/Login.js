@@ -1,71 +1,52 @@
-import React from "react";
+import React, { useState } from "react";
 import axios from "axios";
-import { Link, Redirect } from "react-router-dom";
+import { Link, useHistory } from "react-router-dom";
 
-export default class LoginComponent extends React.Component
+const Login = ( {setLoggedInUser } ) =>
 {
-    state = {}
-    handleSubmit = e =>
-    {
+    const [ email, setEmail ] = useState( "" );
+    const [ password, setPassword ] = useState( "" );
+    const [ message, setMessage ] = useState( "" );
+    const history = useHistory();
+    const handleLogin = ( e ) =>{
         e.preventDefault();
         const data = {
-            email: this.email,
-            password: this.password,
+            email: email,
+            password: password
         };
         axios.post( 'login', data ).then(
-            result =>
-            {
-                localStorage.setItem( 'token', result.data.token );
-                this.setState( {
-                    loggedIn: true
-                } );
-                this.props.setUser( result.data.user );
+            response =>{
+                localStorage.setItem( 'token', response.data.token );
+                setLoggedInUser( response.data.user );
+                history.push('/');
             }
         ).catch(
-            error =>
-            {
-                this.setState( {
-                    message: error.response.data.message
-                } )
-            }
+            error =>{ setMessage( error.response.data.message ); }
         )
     }
-    render ()
-    {
-        if ( this.state.loggedIn )
-        {
-            return <Redirect to='/' />;
-        }
-        let error = '';
-        if ( this.state.message )
-        {
-            error = (
-                <div className="alert alert-danger" role="alert">
-                    { this.state.message }
-                </div>
-            );
-        }
-        return (
-            <form onSubmit={ this.handleSubmit }>
-                { error }
-                <h3>Login</h3>
-                <div className="form-group">
-                    <label>Email:</label>
-                    <input type="email" className="form-control" placeholder="Enter you email."
-                        onChange={ e => this.email = e.target.value } />
-                </div>
-                <div className="form-group">
-                    <label>Password:</label>
-                    <input type="Password" className="form-control" placeholder="Type your password."
-                        onChange={ e => this.password = e.target.value } />
-                </div>
-                <div className="form-group">
-                    <button className="btn btn-info btn-block form-control mt-3">Login</button>
-                </div>
-                <div className="text-center mt-2 d-flex justify-content-around">
-                    Not registered?<Link to={ '/register' }>Register.</Link>
-                </div>
-            </form>
-        )
-    }
+
+    let error = message ? <div className="alert alert-danger" role="alert"> { message } </div> : "";
+    return (
+        <form onSubmit={ handleLogin }>
+            { error }
+            <h3>Login</h3>
+            <div className="form-group">
+                <label>Email:</label>
+                <input type="email" value={ email } className="form-control" placeholder="Enter you email."
+                    onChange={ e => setEmail( e.target.value ) } />
+            </div>
+            <div className="form-group">
+                <label>Password:</label>
+                <input type="Password" value={ password } className="form-control" placeholder="Type your password."
+                    onChange={ e => setPassword( e.target.value ) } />
+            </div>
+            <div className="form-group">
+                <button className="btn btn-info btn-block form-control mt-3">Login</button>
+            </div>
+            <div className="text-center mt-2 d-flex justify-content-around">
+                Not registered?<Link to={ '/register' }>Register.</Link>
+            </div>
+        </form>
+    );
 }
+export default Login;
